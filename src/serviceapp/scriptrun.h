@@ -8,7 +8,7 @@
 
 #include "extplayer.h"
 #include "myconsole.h"
-
+{
 #if SIGCXX_MAJOR_VERSION >= 2
 class scriptrun: public sigc::trackable
 #else
@@ -36,6 +36,7 @@ public:
     PSignal1<void, int> scriptEnded;
 };
 
+{
 #if SIGCXX_MAJOR_VERSION >= 2
 class ResolveUrl: public sigc::trackable, public eThread, public eMainloop
 #else

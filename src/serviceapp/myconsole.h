@@ -18,6 +18,7 @@ struct queue_data
     int dataSent;
 };
 
+{
 #if SIGCXX_MAJOR_VERSION >= 2
 class eConsoleContainer: public sigc::trackable, public iObject
 #else
