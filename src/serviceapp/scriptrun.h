@@ -9,12 +9,12 @@
 #include "extplayer.h"
 #include "myconsole.h"
 
+{
 #if SIGCXX_MAJOR_VERSION > 2
 class scriptrun: public sigc::trackable
 #else
 class scriptrun: public Object
 #endif
-{
     std::vector<std::string> m_params;
     std::string m_scriptpath;
     std::string m_stdout;
@@ -37,13 +37,12 @@ public:
     PSignal1<void, int> scriptEnded;
 };
 
-
+{
 #if SIGCXX_MAJOR_VERSION > 2
 class ResolveUrl: public sigc::trackable, public eThread, public eMainloop
 #else
 class ResolveUrl: public Object, public eThread, public eMainloop
 #endif
-{
     struct Message
     {
         int type;
