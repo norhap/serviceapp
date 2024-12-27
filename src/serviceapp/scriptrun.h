@@ -9,7 +9,7 @@
 #include "extplayer.h"
 #include "myconsole.h"
 
-#if SIGCXX_MAJOR_VERSION == 2
+#if SIGCXX_MAJOR_VERSION > 2
 class scriptrun: public sigc::trackable
 #else
 class scriptrun: public Object
@@ -38,7 +38,7 @@ public:
 };
 
 
-#if SIGCXX_MAJOR_VERSION == 2
+#if SIGCXX_MAJOR_VERSION > 2
 class ResolveUrl: public sigc::trackable, public eThread, public eMainloop
 #else
 class ResolveUrl: public Object, public eThread, public eMainloop
@@ -84,7 +84,7 @@ public:
     std::string getUrl();
 
     void scriptEnded(int retval);
-#if SIGCXX_MAJOR_VERSION == 2
+#if SIGCXX_MAJOR_VERSION > 2
     sigc::signal1<void,int> urlResolved;
 #else
     Signal1<void, int> urlResolved;
