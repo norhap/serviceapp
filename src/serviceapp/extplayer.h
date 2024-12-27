@@ -21,12 +21,12 @@ enum
 	STD_ERROR,
 };
 
+{
 #if SIGCXX_MAJOR_VERSION > 2
 class PlayerApp: public sigc::trackable
 #else
 class PlayerApp: public Object
 #endif
-{
 	ePtr<eConsoleContainer> console;
 	std::string jsonstr;
 	unsigned int parseOutput;
