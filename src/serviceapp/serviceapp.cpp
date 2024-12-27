@@ -20,6 +20,8 @@
 #include "gstplayer.h"
 #include "exteplayer3.h"
 
+#include <Python.h>
+
 enum
 {
 	SUBSERVICES_INDEX_START = 1,
@@ -670,7 +672,9 @@ void eServiceApp::gotExtPlayerMessage(int message)
 
 
 // __iPlayableService
-#if SIGCXX_MAJOR_VERSION > 2
+#if SIGCXX_MAJOR_VERSION == 3
+RESULT eServiceApp::connectEvent(const sigc::slot<void(iPlayableService*,int)>& event, ePtr< eConnection >& connection)
+#elif SIGCXX_MAJOR_VERSION == 2
 RESULT eServiceApp::connectEvent(const sigc::slot2< void, iPlayableService*, int >& event, ePtr< eConnection >& connection)
 #else
 RESULT eServiceApp::connectEvent(const Slot2< void, iPlayableService*, int >& event, ePtr< eConnection >& connection)
@@ -1277,6 +1281,7 @@ int eServiceApp::getInfo(int w)
 		}
 		return resNA;
 	}
+	case sSID: return m_ref.getData(1);
 	default:
 		return resNA;
 	}
@@ -1285,23 +1290,16 @@ int eServiceApp::getInfo(int w)
 
 std::string eServiceApp::getInfoString(int w)
 {
-	if ( strstr(m_ref.path.c_str(), "://") )
+	switch (w)
 	{
-		switch (w)
-		{
-		case sProvider:
-			return "IPTV";
-		case sServiceref:
-		{
-			eServiceReference ref(m_ref);
-			ref.type = m_ref.type;
-			ref.path.clear();
-			return ref.toString();
-		}
-		default:
-			break;
-		}
+	case sProvider:
+		return m_ref.path.find("://") != std::string::npos ? "IPTV" : "FILE";
+	case sServiceref:
+		return m_ref.toString();
+	default:
+		break;
 	}
+
 	if (w < sUser && w > 26 )
 		return "";
 	switch(w)
@@ -1697,10 +1695,27 @@ static PyMethodDef serviceappMethods[] = {
 	 {NULL,NULL,0,NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	"serviceapp",        /* m_name */
+	"serviceapp",        /* m_doc */
+	-1,                  /* m_size */
+	serviceappMethods,   /* m_methods */
+	NULL,                /* m_reload */
+	NULL,                /* m_traverse */
+	NULL,                /* m_clear */
+	NULL,                /* m_free */
+};
+#endif
+
 PyMODINIT_FUNC
+#if PY_MAJOR_VERSION >= 3
+PyInit_serviceapp(void)
+#else
 initserviceapp(void)
+#endif
 {
-	Py_InitModule("serviceapp", serviceappMethods);
 	g_GstPlayerOptionsServiceMP3 = new GstPlayerOptions();
 	g_GstPlayerOptionsServiceGst = new GstPlayerOptions();
 	g_GstPlayerOptionsUser = new GstPlayerOptions();
@@ -1716,4 +1731,9 @@ initserviceapp(void)
 
 	SSL_load_error_strings();
 	SSL_library_init();
+#if PY_MAJOR_VERSION >= 3
+	return PyModule_Create(&moduledef);
+#else
+	Py_InitModule("serviceapp", serviceappMethods);
+#endif
 }
